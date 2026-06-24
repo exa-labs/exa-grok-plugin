@@ -1,0 +1,20 @@
+{
+  "name": "exa",
+  "version": "1.0.0",
+  "description": "Web search, content extraction, and deep research for Grok Build — via the hosted Exa MCP server.",
+  "author": {
+    "name": "Exa",
+    "url": "https://github.com/exa-labs"
+  },
+  "repository": "https://github.com/exa-labs/exa-grok-plugin",
+  "homepage": "https://exa.ai",
+  "license": "MIT",
+  "keywords": [
+    "exa",
+    "search",
+    "web-search",
+    "research",
+    "content-extraction",
+    "mcp"
+  ]
+}

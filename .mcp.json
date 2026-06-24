@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "exa": {
+      "type": "http",
+      "url": "https://mcp.exa.ai/mcp",
+      "note": "Exa hosted MCP server. Authenticates via OAuth on first connection — no API key needed. Tools: web_search_exa, web_search_advanced_exa, web_fetch_exa."
+    }
+  }
+}
