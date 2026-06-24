@@ -1,10 +1,10 @@
 ---
 name: exa-research
 description: |
-  Deep research using Exa advanced search. Use this skill for company research,
-  people search, competitive analysis, market research, academic papers, financial
-  reports, or any task requiring filtered, structured web search with domain
-  restrictions, date ranges, and category filters.
+  Advanced web research with category filters, domain restrictions, date ranges,
+  and content controls. Use for company research, people search, news monitoring,
+  academic papers, financial reports, or any search requiring precise filtering.
+  This skill uses web_search_advanced_exa.
 allowed-tools:
   - mcp__exa__web_search_advanced_exa
   - mcp__exa__web_fetch_exa
@@ -12,73 +12,87 @@ allowed-tools:
 
 # Exa Research
 
-## Via the Exa MCP (preferred)
+Use `web_search_advanced_exa` for filtered, structured research. Exa indexes
+50M+ companies, 1B+ people profiles, 100M+ research papers, and specialized
+collections of news, financial reports, and personal sites.
 
-This plugin bundles the Exa MCP server. Use the **`web_search_advanced_exa`** tool for research tasks that need precise filtering.
+## Categories
 
-## When to use
+| Category | Index size | Best for |
+|---|---|---|
+| `company` | 50M+ pages | Company discovery, metadata (headcount, funding, revenue, industry) |
+| `people` | 1B+ profiles | LinkedIn profiles, professional backgrounds, hiring |
+| `news` | Live | Press coverage, announcements, current events |
+| `research paper` | 100M+ papers | arXiv, OpenReview, PubMed, scientific literature |
+| `financial report` | — | SEC filings (10-K, 10-Q, 8-K, S-1), earnings reports |
+| `personal site` | — | Blogs, portfolios, independent analysis |
+| _(no category)_ | Full web | General results when you don't know the surface |
 
-- Company research, competitor analysis, market research
-- People search (LinkedIn profiles, professional backgrounds)
-- Academic paper discovery
-- Financial report search (SEC filings, earnings reports)
-- Any search requiring domain, date, or category filters
+## Company research
 
-## Available categories
-
-| Category | Best for |
-|---|---|
-| `company` | Company homepages, metadata (headcount, funding, revenue) |
-| `news` | Press coverage, announcements, recent articles |
-| `people` | LinkedIn profiles, public bios |
-| `personal site` | Personal blogs, portfolio sites |
-| `financial report` | SEC filings, earnings reports, investor presentations |
-| `research paper` | Academic papers, studies |
-| _(no category)_ | General web results, broader context |
-
-## Examples
-
-### Company research
 ```
 web_search_advanced_exa {
-  "query": "AI infrastructure startups San Francisco",
+  "query": "AI infrastructure startups Series A San Francisco",
   "category": "company",
-  "numResults": 20,
+  "numResults": 25,
   "type": "auto"
 }
 ```
 
-### People search
+Returns company pages with structured metadata. For deeper enrichment, use
+`type: "deep"` to get synthesized profiles across multiple sources.
+
+**Restrictions with `company` category:** `includeDomains`, `excludeDomains`,
+`startPublishedDate`, `endPublishedDate` are NOT supported — use natural
+language in the query instead (e.g. "founded after 2023").
+
+## People search
+
 ```
 web_search_advanced_exa {
-  "query": "VP Engineering AI infrastructure",
+  "query": "VP Engineering machine learning Bay Area",
   "category": "people",
   "numResults": 20,
   "type": "auto"
 }
 ```
 
-### News with date filter
+Searches across LinkedIn and other professional sources.
+
+**Restrictions with `people` category:** Only `includeDomains` with LinkedIn
+domains is supported. Date filters, `excludeDomains`, `includeText`,
+`excludeText` are NOT supported.
+
+## News
+
 ```
 web_search_advanced_exa {
-  "query": "Anthropic AI safety",
+  "query": "Anthropic AI safety regulation",
   "category": "news",
   "numResults": 15,
-  "startPublishedDate": "2025-01-01"
+  "startPublishedDate": "2026-01-01"
 }
 ```
 
-### Domain-restricted deep search
+Supports full filtering — domain, date, text inclusion/exclusion.
+
+## Research papers
+
 ```
 web_search_advanced_exa {
-  "query": "React server components best practices",
-  "type": "deep",
-  "numResults": 10,
-  "includeDomains": ["react.dev", "github.com", "vercel.com"]
+  "query": "transformer attention mechanisms efficiency",
+  "category": "research paper",
+  "includeDomains": ["arxiv.org", "openreview.net"],
+  "startPublishedDate": "2025-01-01",
+  "numResults": 20,
+  "type": "deep"
 }
 ```
 
-### Financial reports
+Full filter support. Good for literature reviews and finding recent work.
+
+## Financial reports
+
 ```
 web_search_advanced_exa {
   "query": "Q4 2025 earnings report technology",
@@ -88,21 +102,43 @@ web_search_advanced_exa {
 }
 ```
 
-## Category filter restrictions
+**Restriction:** `excludeText` is NOT supported for this category.
 
-When using `category: "company"`, these parameters are **not supported**:
-- `includeDomains` / `excludeDomains`
-- `startPublishedDate` / `endPublishedDate`
+## General filtered search (no category)
 
-When using `category: "people"`, these parameters are **not supported**:
-- Date filters, `excludeDomains`, `includeText`, `excludeText`
-- `includeDomains` only supports LinkedIn domains
+When you don't need a specific vertical, drop the category and use domain/date
+filters for precision:
 
-`includeText` and `excludeText` only accept **single-item arrays** across all categories.
+```
+web_search_advanced_exa {
+  "query": "React server components best practices",
+  "type": "deep",
+  "numResults": 10,
+  "includeDomains": ["react.dev", "github.com", "vercel.com"],
+  "startPublishedDate": "2025-06-01"
+}
+```
 
-## Tips
+## Search types
 
-- Start with `category: "company"` for discovery, then drop the category for deeper dives
-- Generate 2-3 query variations for broader coverage, then merge and deduplicate
-- Use `type: "deep"` for thorough results when precision matters
-- Use `web_fetch_exa` to read full content of promising results
+| Type | Latency | Use case |
+|---|---|---|
+| `auto` | ~1s | Default, balanced |
+| `instant` | ~250ms | Real-time chat, voice |
+| `fast` | ~450ms | Speed-sensitive workflows |
+| `deep` | 4-15s | Complex queries, structured output |
+| `deep-reasoning` | 12-40s | Maximum reasoning for hard research |
+
+## Global filter restrictions
+
+- `includeText` and `excludeText` accept **single-item arrays only** — multi-item
+  arrays cause 400 errors. Put multiple terms in the query string instead.
+- For coverage, use `additionalQueries` to run 2-3 query variations in parallel.
+
+## Query tips
+
+- Write semantic queries, not keyword strings
+- For coverage: use `additionalQueries` with phrasing variations
+- Start with a category for discovery, drop it for broader context
+- Use `enableHighlights: true` + `highlightsQuery` to extract specific passages
+- Use `enableSummary: true` + `summaryQuery` to get targeted summaries
