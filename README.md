@@ -18,9 +18,17 @@ curl -fsSL https://x.ai/cli/install.sh | bash
 grok login
 ```
 
-3. In Grok Build, run `/plugin`, search for **exa**, and select it to install.
+3. Start Grok Build by running `grok`, then open the marketplace:
 
-4. On first connection, Grok asks you to sign in to your Exa account in the browser. No API key needed. New accounts get free credits at signup.
+```text
+/marketplace
+```
+
+4. Find **exa** in the list and press `i` to install it.
+
+5. Open the MCP servers tab with `/mcp`, select **exa**, and press `i` to sign in. Your browser opens the Exa sign-in page. New accounts get free credits at signup.
+
+6. Once exa shows **ready**, ask Grok anything that needs the web.
 
 ## Tools
 
@@ -43,7 +51,3 @@ grok login
 - [Benchmarks](https://github.com/exa-labs/benchmarks)
 - [Blog](https://exa.ai/blog)
 - [Get API Key](https://dashboard.exa.ai/api-keys)
-
-## License
-
-MIT
