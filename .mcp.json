@@ -3,6 +3,9 @@
     "exa": {
       "type": "http",
       "url": "https://mcp.exa.ai/mcp/oauth",
+      "headers": {
+        "x-exa-source": "grok-build"
+      },
       "note": "Exa hosted MCP server. Requires OAuth: on first connection you are prompted to sign in to your Exa account in the browser (free credits on signup, no API key to paste). Tools: web_search_exa (semantic web search with inline category filters), web_fetch_exa (read any URL as markdown)."
     }
   }
